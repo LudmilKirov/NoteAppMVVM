@@ -27,6 +27,7 @@ public class NoteViewModel extends AndroidViewModel {
     private NoteRespository repository;
     private NoteDao noteDao;
     private LiveData<List<Note>> allNotes;
+    private MutableLiveData<Boolean> booleanLiveData = new MutableLiveData<>();
 
     public NoteViewModel(@NonNull Application application) {
         super(application);
@@ -34,8 +35,14 @@ public class NoteViewModel extends AndroidViewModel {
         noteDao = database.noteDao();
         repository = new NoteRespository(application);
         allNotes = repository.getAllNotes();
+        setBooleanLiveData(true);
     }
 
+    private void setBooleanLiveData(boolean b) {
+       booleanLiveData.setValue(b);
+    }
+
+   // private MutableLiveData<>
 
     public void insert(Note note) {
         new InsertNoteAsyncTask(noteDao).execute(note);
@@ -56,6 +63,8 @@ public class NoteViewModel extends AndroidViewModel {
     public LiveData<List<Note>> getAllNotes() {
         return allNotes;
     }
+
+    //public  LiveData<Boolean> getBooleanValue(){return }
 
     private static class InsertNoteAsyncTask extends AsyncTask<Note, Void, Void> {
         private NoteDao noteDao;
