@@ -2,6 +2,8 @@ package com.example.noteappmvvm;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatEditText;
+
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +13,9 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Toast;
+
+
+//import com.example.noteappmvvm.databinding.ActivityMainBinding;
 
 public class AddEditNoteActivity extends AppCompatActivity {
     public static final String EXTRA_TITLE =
@@ -25,10 +30,23 @@ public class AddEditNoteActivity extends AppCompatActivity {
     private EditText editTextDescription;
     private NumberPicker numberPickerPriority;
 
+    private NoteViewModel noteViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
+//
+
+//        ActivityAddNoteBinding binding;
+//        //noteViewModel = DataBindingUtil.setContentView(this,id);
+//        //= DataBindingUtil.setContentView(this, R.layout.activity_main);
+//        binding= DataBindingUtil.inflate(getLayoutInflater(),R.layout.activity_add_note,null,false);
+//        setContentView(binding.getRoot());
+//
+//        binding.setViewmodel(noteViewModel);
+//        binding.setLifecycleOwner(this);
+
 
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
@@ -36,6 +54,7 @@ public class AddEditNoteActivity extends AppCompatActivity {
         //Set the priorities of the tasks
         numberPickerPriority.setMinValue(1);
         numberPickerPriority.setMaxValue(10);
+
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         Intent intent = getIntent();
@@ -96,6 +115,7 @@ public class AddEditNoteActivity extends AppCompatActivity {
         }
 
         setResult(RESULT_OK, data);
+
         finish();
     }
 }
