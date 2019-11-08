@@ -11,6 +11,7 @@ public class NoteRespository {
     private NoteDao noteDao;
     private LiveData<List<Note>> allNotes;
 
+    //TODO remove the appdatabase
     public NoteRespository(Application application) {
         AppDatabase database = AppDatabase.getInstance(application);
         noteDao = database.noteDao();

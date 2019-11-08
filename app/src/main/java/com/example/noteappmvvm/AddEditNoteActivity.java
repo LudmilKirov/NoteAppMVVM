@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Toast;
@@ -84,6 +86,8 @@ public class AddEditNoteActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.save_note:
                 saveNote();
+                View view = new View(this);
+                hideKeybaord(view);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -117,5 +121,10 @@ public class AddEditNoteActivity extends AppCompatActivity {
         setResult(RESULT_OK, data);
 
         finish();
+    }
+
+    private void hideKeybaord(View v) {
+        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(),0);
     }
 }

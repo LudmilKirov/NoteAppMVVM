@@ -9,6 +9,8 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+//Instantiate in MainActivity
+
 @Database(entities = {Note.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 

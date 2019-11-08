@@ -9,6 +9,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -20,6 +21,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,7 +29,10 @@ public class NoteViewModel extends AndroidViewModel {
     private NoteRespository repository;
     private NoteDao noteDao;
     private LiveData<List<Note>> allNotes;
+    private NoteViewModel noteViewModel;
     private MutableLiveData<Boolean> booleanLiveData = new MutableLiveData<>();
+
+    //TODO Remove the dao first create the value of the livedata for getAll put it in Asynctask
 
     public NoteViewModel(@NonNull Application application) {
         super(application);
@@ -35,14 +40,15 @@ public class NoteViewModel extends AndroidViewModel {
         noteDao = database.noteDao();
         repository = new NoteRespository(application);
         allNotes = repository.getAllNotes();
+        noteViewModel = this;
         setBooleanLiveData(true);
     }
 
     private void setBooleanLiveData(boolean b) {
-       booleanLiveData.setValue(b);
+        booleanLiveData.setValue(b);
     }
 
-   // private MutableLiveData<>
+    // private MutableLiveData<>
 
     public void insert(Note note) {
         new InsertNoteAsyncTask(noteDao).execute(note);
@@ -64,9 +70,11 @@ public class NoteViewModel extends AndroidViewModel {
         return allNotes;
     }
 
-    //public  LiveData<Boolean> getBooleanValue(){return }
+    public LiveData<Boolean> getBooleanValue() {
+        return booleanLiveData;
+    }
 
-    private static class InsertNoteAsyncTask extends AsyncTask<Note, Void, Void> {
+    private class InsertNoteAsyncTask extends AsyncTask<Note, Void, Void> {
         private NoteDao noteDao;
 
         private InsertNoteAsyncTask(NoteDao noteDao) {
@@ -76,26 +84,28 @@ public class NoteViewModel extends AndroidViewModel {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            booleanLiveData.setValue(false);
         }
 
         @Override
         protected Void doInBackground(Note... notes) {
-            noteDao.insert(notes[0]);
+
             final long start = System.currentTimeMillis();
             // wait 5 seconds (5000 milliseconds) until proceeding
             while (System.currentTimeMillis() - start < 5000) {
             }
-
+            noteDao.insert(notes[0]);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            booleanLiveData.setValue(true);
         }
     }
 
-    private static class UpdateNoteAsyncTask extends AsyncTask<Note, Void, Void> {
+    private class UpdateNoteAsyncTask extends AsyncTask<Note, Void, Void> {
         private NoteDao noteDao;
 
         NoteViewModel noteViewModel;
@@ -106,27 +116,35 @@ public class NoteViewModel extends AndroidViewModel {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            booleanLiveData.setValue(false);
+
+        }
+
+        @Override
         protected Void doInBackground(Note... notes) {
+            final long start = System.currentTimeMillis();
+            // wait 5 seconds (5000 milliseconds) until proceeding
+            while (System.currentTimeMillis() - start < 5000) {
+            }
             noteDao.update(notes[0]);
             return null;
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-
-         // noteViewModel.setShowDialog();
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            booleanLiveData.setValue(true);
         }
 
-        @Override
-        protected void onPreExecute() {
-
-        }
     }
 
-    private static class DeleteNoteAsyncTask extends AsyncTask<Note, Void, Void> {
+    private class DeleteNoteAsyncTask extends AsyncTask<Note, Void, Void> {
 
         private NoteDao noteDao;
+        //TODO//Remove the dao use the repository
+        //TODO//In get all addd the value of the object to the livedata
 
 
         private DeleteNoteAsyncTask(NoteDao noteDao) {
@@ -134,13 +152,30 @@ public class NoteViewModel extends AndroidViewModel {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            booleanLiveData.setValue(false);
+
+        }
+
+        @Override
         protected Void doInBackground(Note... notes) {
+            final long start = System.currentTimeMillis();
+            // wait 5 seconds (5000 milliseconds) until proceeding
+            while (System.currentTimeMillis() - start < 5000) {
+            }
             noteDao.delete(notes[0]);
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            booleanLiveData.setValue(true);
+        }
     }
 
-    private static class DeleteAllNoteAsyncTask extends AsyncTask<Void, Void, Void> {
+    private class DeleteAllNoteAsyncTask extends AsyncTask<Void, Void, Void> {
         private NoteDao noteDao;
 
         private DeleteAllNoteAsyncTask(NoteDao noteDao) {
@@ -148,9 +183,26 @@ public class NoteViewModel extends AndroidViewModel {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            booleanLiveData.setValue(false);
+
+        }
+
+        @Override
         protected Void doInBackground(Void... voids) {
+            final long start = System.currentTimeMillis();
+            // wait 5 seconds (5000 milliseconds) until proceeding
+            while (System.currentTimeMillis() - start < 5000) {
+            }
             noteDao.deleteAllNotes();
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            booleanLiveData.setValue(true);
         }
     }
 }

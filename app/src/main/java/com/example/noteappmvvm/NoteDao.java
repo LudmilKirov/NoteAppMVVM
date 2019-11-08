@@ -29,7 +29,7 @@ public interface NoteDao {
 
 //    @Query("SELECT * FROM note_table ORDER BY priority DESC")
 //    LiveData<List<Note>> getAllNote();
-
+//TODO return plain list object
     @Query("SELECT * FROM note_table ORDER BY priority DESC")
     LiveData<List<Note>> getAllNote();
 }

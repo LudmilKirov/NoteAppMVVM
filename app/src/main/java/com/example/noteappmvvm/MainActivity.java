@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.icu.text.UnicodeSetSpanner;
 import android.os.AsyncTask;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -32,8 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private NoteViewModel noteViewModel;
     public static final int ADD_NOTE_REQUEST = 1;
     public static final int EDIT_NOTE_REQUEST = 2;
-    public boolean booleanForDialog = false;
-    private List<Note> notes;
+    private AlertDialog mAlertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,14 +56,30 @@ public class MainActivity extends AppCompatActivity {
 
         final NoteAdapter adapter = new NoteAdapter();
         recyclerView.setAdapter(adapter);
-
-        final ProgressBar progressBar = findViewById(R.id.simpleProgressBar);
-
+        //To observe the view model for a change of the list
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
         noteViewModel.getAllNotes().observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(@Nullable List<Note> notes) {
                 adapter.submitList(notes);
+            }
+        });
+
+        //Create the dialog for the loading
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage("Loading");
+        builder.setCancelable(false);
+        mAlertDialog = builder.create();
+
+        //Create the observer for the live data that changes in the async task for add method.
+        noteViewModel.getBooleanValue().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (!aBoolean) {
+                    mAlertDialog.show();
+                } else {
+                    mAlertDialog.hide();
+                }
             }
         });
 
@@ -78,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 //get the object that wnat to be delete
                 noteViewModel.delete(adapter.getNoteAt(viewHolder.getAdapterPosition()));
-                Toast.makeText(MainActivity.this, "Note deleted", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "Note deleted", Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(recyclerView);
 
@@ -109,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
             noteViewModel.insert(note);
 
-            Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
         } else if (requestCode == EDIT_NOTE_REQUEST && resultCode == RESULT_OK) {
             int id = data.getIntExtra(AddEditNoteActivity.EXTRA_ID, -1);
             if (id == -1) {
@@ -123,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             Note note = new Note(title, description, priority);
             note.setId(id);
             noteViewModel.update(note);
-            Toast.makeText(this, "Update", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Update", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Note not saved", Toast.LENGTH_SHORT).show();
         }
@@ -142,10 +159,11 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.delete_all_notes:
                 noteViewModel.deleteAllNotes();
-                Toast.makeText(this, "All notes deleted", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "All notes deleted", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 }
 
